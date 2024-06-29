@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(category);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public Category update(Long id, Category category) {
         Category categoryToUpdate = categoryRepository.findById(id).orElseThrow();
         categoryToUpdate.setName(category.getName());
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(categoryToUpdate);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public void deleteById(Long id) {
         categoryRepository.deleteById(id);
     }

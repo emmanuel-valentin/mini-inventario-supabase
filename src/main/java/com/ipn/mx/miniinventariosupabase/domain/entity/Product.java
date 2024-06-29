@@ -2,18 +2,22 @@ package com.ipn.mx.miniinventariosupabase.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "product")
 public class Product implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -33,7 +37,7 @@ public class Product implements Serializable {
     @Column(name = "product_stock", nullable = false)
     private Integer stock;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "category_id")
     private Category category;
 }

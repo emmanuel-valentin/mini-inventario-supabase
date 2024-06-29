@@ -1,8 +1,11 @@
 package com.ipn.mx.miniinventariosupabase.service.impl;
 
+import com.ipn.mx.miniinventariosupabase.domain.entity.Category;
 import com.ipn.mx.miniinventariosupabase.domain.entity.Product;
+import com.ipn.mx.miniinventariosupabase.domain.repository.CategoryRepository;
 import com.ipn.mx.miniinventariosupabase.domain.repository.ProductRepository;
 import com.ipn.mx.miniinventariosupabase.service.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Transactional(readOnly = true)
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -25,22 +31,28 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(id);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public Product save(Product product) {
+        if (product.getCategory().getId() != null) {
+            Category existingCategory = categoryRepository.findById(product.getCategory().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+            product.setCategory(existingCategory);
+        }
         return productRepository.save(product);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public Product update(Long id, Product product) {
-        Product productToSave = productRepository.findById(id).orElseThrow();
-        productToSave.setName(product.getName());
-        productToSave.setDescription(product.getDescription());
-        productToSave.setPrice(product.getPrice());
-        productToSave.setStock(product.getStock());
-        return productRepository.save(productToSave);
+        Product productToUpdate = productRepository.findById(id).orElseThrow();
+        productToUpdate.setName(product.getName());
+        productToUpdate.setDescription(product.getDescription());
+        productToUpdate.setPrice(product.getPrice());
+        productToUpdate.setStock(product.getStock());
+        productToUpdate.setCategory(product.getCategory());
+        return productRepository.save(productToUpdate);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
